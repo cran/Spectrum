@@ -8,7 +8,7 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
   diffusion = TRUE, kerneltype = c("density", "stsc"), maxk = 10,
   NN = 3, NN2 = 7, showpca = FALSE, showheatmap = FALSE,
   showdimred = FALSE, visualisation = c("umap", "tsne"), frac = 2,
-  thresh = 7)
+  thresh = 7, fontsize = 18)
 }
 \arguments{
 \item{data}{Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.}
@@ -40,6 +40,8 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 \item{frac}{Numerical value: optk search param, fraction to find the last substantial drop (multimodality gap method param)}
 
 \item{thresh}{Numerical value: optk search param, how many points ahead to keep searching (multimodality gap method param)}
+
+\item{fontsize}{Numerical value: controls font size of the ggplot2 plots}
 }
 \value{
 A list, containing: 

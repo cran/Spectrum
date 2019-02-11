@@ -270,7 +270,7 @@ findk <- function(res,maxk=maxk,thresh=4,frac=2){
 }
 
 ### tuner for locally adaptive density aware kernel
-kernfinder_mine <- function(data,maxk=10,fontsize=22,silent=silent,
+kernfinder_mine <- function(data,maxk=10,fontsize=fontsize,silent=silent,
                             showres=showres,dotsize=dotsize){ # accepts the eigenvector decomposition of L
   if (silent == FALSE){
     message('finding optimal NN kernel parameter by examining eigenvector distributions')
