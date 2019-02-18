@@ -22,6 +22,7 @@
 #' @param frac Numerical value: optk search param, fraction to find the last substantial drop (multimodality gap method param)
 #' @param thresh Numerical value: optk search param, how many points ahead to keep searching (multimodality gap method param)
 #' @param fontsize Numerical value: controls font size of the ggplot2 plots
+#' @param dotsize Numerical value: controls the dot size of the ggplot2 plots
 #'
 #' @return A list, containing: 
 #' 1) cluster assignments, in the same order as input data columns 
@@ -38,7 +39,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
                      kerneltype=c('density','stsc'),maxk=10,NN=3,NN2=7,
                      showpca=FALSE,showheatmap=FALSE,showdimred=FALSE,
                      visualisation=c('umap','tsne'),frac=2,thresh=7,
-                     fontsize=18){
+                     fontsize=18,dotsize=3){
   
   kerneltype <- match.arg(kerneltype)
   visualisation <- match.arg(visualisation)
@@ -68,13 +69,13 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     if (kerneltype == 'stsc'){
       if (method == 2){
         NN <- kernfinder_local(datalist[[platform]],maxk=maxk,silent=silent,fontsize=fontsize,
-                               dotsize=3,showres=showres)
+                               dotsize=dotsize,showres=showres)
       }
       kerneli <- rbfkernel_b(datalist[[platform]],K=NN,sigma=1)
     }else if (kerneltype == 'density'){ 
       if (method == 2){
         NN <- kernfinder_mine(datalist[[platform]],maxk=maxk,silent=silent,
-                              showres=showres,fontsize=fontsize,dotsize=3)
+                              showres=showres,fontsize=fontsize,dotsize=dotsize)
       }
       kerneli <- CNN_kernel_mine_b(datalist[[platform]],NN=NN,NN2=7)
     }
@@ -153,7 +154,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     nn <- maxk+1
     d <- data.frame(K=seq(1,maxk+1),evals=evals[1:nn])
     if (showres == TRUE){
-      plot_egap(d,maxk=maxk,dotsize=3,
+      plot_egap(d,maxk=maxk,dotsize=dotsize,
                 fontsize=fontsize)
     }
   }else if (method == 2){
@@ -169,7 +170,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     res <- EM_finder(xi,silent=silent)
     d <- data.frame('K'=seq(1,maxk+1),'Z'=res[1:(maxk+1),2])
     if (showres == TRUE){
-      plot_multigap(d,maxk=maxk,dotsize=3,
+      plot_multigap(d,maxk=maxk,dotsize=dotsize,
                     fontsize=fontsize)
     }
     optk <- findk(res,maxk=maxk,frac=frac,thresh=thresh)
@@ -206,18 +207,18 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     }
     if (showdimred == TRUE && visualisation == 'umap'){ # method 1
       message('running UMAP on affinity...')
-      umap(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=3)
+      umap(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
       message('done.')
     }
     if (showdimred == TRUE && visualisation == 'tsne'){ # method 2
       message('running t-SNE on affinity...')
-      tsne(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=3)
+      tsne(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
       message('done.')
     }
   }
   if (length(datalist) == 1 && showres == TRUE){ # for one data source only
     if (showpca == TRUE){
-      pca(datalist[[1]],labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=3)
+      pca(datalist[[1]],labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
     }
   }
   

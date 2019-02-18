@@ -36,8 +36,8 @@ Spectrum is a versatile ultra-fast spectral clustering method for single or mult
 - Data should be normalised appropiately so the samples are comparable
 - Data should be transformed appropiately so different features are comparable
 - Data must be on a continuous scale
-- Data may be small (100s of samples) to very large (1000s or more of samples)
-- Multi-view data must have the same number of samples in the same order
+- Data may be small (10s-100s of samples) to large (1000s-10000s of samples)
+- Multi-view data must have the same number of samples and samples must be in exactly the same order
 
 ## 2. Single-view clustering: Gaussian blobs
 
@@ -47,7 +47,7 @@ The first plot will show the eigenvalues where the greatest gap in used to decid
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
-test1 <- Spectrum(blobs,showdimred=TRUE,fontsize=8)
+test1 <- Spectrum(blobs,showdimred=TRUE,fontsize=8,dotsize=2)
 ```
 
 Spectrum generates a number of outputs for the user including the cluster each sample is within in the 'assignments' vector contained in the results list (see below code). Use a '$' sign to access the results contained in the list's elements and for more information, see ?Spectrum. Cluster assignments will be in the same order as the input data.
@@ -65,7 +65,7 @@ The first plot will show the eigenvalues where the greatest gap in used to decid
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
 RNAseq <- brain[[1]]
-test2 <- Spectrum(RNAseq,showdimred=TRUE,fontsize=8)
+test2 <- Spectrum(RNAseq,showdimred=TRUE,fontsize=8,dotsize=2)
 ```
 
 ## 4. Multi-view clustering: Brain cancer multi-omics
@@ -76,7 +76,7 @@ The first plot will show the eigenvalues where the greatest gap in used to decid
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
-test3 <- Spectrum(brain,showdimred=TRUE,fontsize=8)
+test3 <- Spectrum(brain,showdimred=TRUE,fontsize=8,dotsize=2)
 ```
 
 ## 5. Single-view clustering: Non-Gaussian data, 3 circles 
@@ -89,7 +89,7 @@ When the multimodality is higher the eigenvectors are more informative, so when 
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
-test4 <- Spectrum(circles,showpca=TRUE,method=2,fontsize=8)
+test4 <- Spectrum(circles,showpca=TRUE,method=2,fontsize=8,dotsize=2)
 ```
 
 ## 6. Single-view clustering: Non-Gaussian data, spirals
@@ -98,7 +98,7 @@ Same as the last example, but for the spirals dataset.
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
-test5 <- Spectrum(spirals,showpca=TRUE,method=2,fontsize=8)
+test5 <- Spectrum(spirals,showpca=TRUE,method=2,fontsize=8,dotsize=2)
 ```
 
 ## 7. Closing comments
