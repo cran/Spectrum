@@ -1,14 +1,14 @@
-#' Spectrum: Versatile ultra-fast spectral clustering for single and multi-view data
+#' Spectrum: Fast Adaptive Spectral Clustering for Single and Multi-view Data
 #'
-#' Spectrum is a fast adaptive spectral clustering method for single or multi-view data. Spectrum uses a new type of adaptive
+#' Spectrum is a self-tuning spectral clustering method for single or multi-view data. Spectrum uses a new type of adaptive
 #' density aware kernel that strengthens local connections in the graph. For integrating multi-view data and reducing noise
-#' a tensor product graph data integration and diffusion procedure is used. Spectrum contains two approaches for finding
-#' the number of clusters (K); the classical eigengap method and a novel multimodality gap method. The multimodality gap analyses
-#' the distribution of the eigenvectors of the graph Laplacian to decide K and can be used to tune the kernel.
+#' a tensor product graph data integration and diffusion procedure is used. Spectrum analyses eigenvector variance or distribution
+#' to determine the number of clusters. Spectrum is well suited for a wide range of data, including both Gaussian and non-Gaussian
+#' structures.
 #'
 #' @param data Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.
-#' @param method Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-linear clusters)
-#' @param maxk Numerical value: the maximum number of expected clusters (default  = 10). This is data dependent - do not set excessively high.
+#' @param method Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters)
+#' @param maxk Numerical value: the maximum number of expected clusters (default  = 10). This is data dependent, do not set excessively high.
 #' @param silent Logical flag: whether to turn off messages
 #' @param showres Logical flag: whether to show the results on the screen
 #' @param diffusion Logical flag: whether to perform graph diffusion to reduce noise and boost performance, usually recommended
@@ -16,19 +16,21 @@
 #' @param NN Numerical value: kernel param, the number of nearest neighbours to use sigma parameters (default = 3)
 #' @param NN2 Numerical value: kernel param, the number of nearest neighbours to use for the common nearest neigbours (default = 7)
 #' @param showpca Logical flag: whether to show pca when running on one view
-#' @param showheatmap Logical flag: whether to show heatmap of affinity matrix when running on one view
-#' @param showdimred Logical flag: whether to show UMAP or t-SNE of final affinity matrix
-#' @param visualisation Character string: what kind of dimensionality reduction to run on the affinity matrix (umap or tsne)
+#' @param showheatmap Logical flag: whether to show heatmap of similarity matrix when running on one view
+#' @param showdimred Logical flag: whether to show UMAP or t-SNE of final similarity matrix
+#' @param visualisation Character string: what kind of dimensionality reduction to run on the similarity matrix (umap or tsne)
 #' @param frac Numerical value: optk search param, fraction to find the last substantial drop (multimodality gap method param)
 #' @param thresh Numerical value: optk search param, how many points ahead to keep searching (multimodality gap method param)
 #' @param fontsize Numerical value: controls font size of the ggplot2 plots
 #' @param dotsize Numerical value: controls the dot size of the ggplot2 plots
+#' @param tunekernel Logical flag: whether to tune the kernel, only applies for method 2
+#' @param clusteralg Character string: clustering algorithm for eigenvector matrix (GMM or km)
 #'
 #' @return A list, containing: 
 #' 1) cluster assignments, in the same order as input data columns 
 #' 2) eigenvector analysis results (either eigenvalues or dip test statistics)
 #' 3) optimal K
-#' 4) final affinity matrix
+#' 4) final similarity matrix
 #' 5) eigenvectors and eigenvalues of graph Laplacian
 #' @export
 #'
@@ -39,8 +41,9 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
                      kerneltype=c('density','stsc'),maxk=10,NN=3,NN2=7,
                      showpca=FALSE,showheatmap=FALSE,showdimred=FALSE,
                      visualisation=c('umap','tsne'),frac=2,thresh=7,
-                     fontsize=18,dotsize=3){
+                     fontsize=18,dotsize=3,tunekernel=TRUE,clusteralg='GMM'){
   
+  ###
   kerneltype <- match.arg(kerneltype)
   visualisation <- match.arg(visualisation)
   
@@ -68,14 +71,22 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     }
     if (kerneltype == 'stsc'){
       if (method == 2){
-        NN <- kernfinder_local(datalist[[platform]],maxk=maxk,silent=silent,fontsize=fontsize,
-                               dotsize=dotsize,showres=showres)
+        if (tunekernel){
+          NN <- kernfinder_local(datalist[[platform]],maxk=maxk,silent=silent,fontsize=fontsize,
+                                 dotsize=dotsize,showres=showres)
+        }else{
+          NN <- 3
+        }
       }
       kerneli <- rbfkernel_b(datalist[[platform]],K=NN,sigma=1)
     }else if (kerneltype == 'density'){ 
       if (method == 2){
-        NN <- kernfinder_mine(datalist[[platform]],maxk=maxk,silent=silent,
-                              showres=showres,fontsize=fontsize,dotsize=dotsize)
+        if (tunekernel){
+          NN <- kernfinder_mine(datalist[[platform]],maxk=maxk,silent=silent,
+                                showres=showres,fontsize=fontsize,dotsize=dotsize)
+        }else{
+          NN <- 3
+        }
       }
       kerneli <- CNN_kernel_mine_b(datalist[[platform]],NN=NN,NN2=7)
     }
@@ -157,7 +168,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
       plot_egap(d,maxk=maxk,dotsize=dotsize,
                 fontsize=fontsize)
     }
-  }else if (method == 2){
+  }else if (method == 2){ # multimodality gap heuristic
     if (silent == FALSE){
       message('getting eigendecomposition of L...')
     }
@@ -186,18 +197,29 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
   # replace NA values (row = 0) with zeros
   yi[which(!is.finite(yi))] <- 0
   
-  ### GMM
-  if (silent == FALSE){
-    message('doing GMM clustering...')
-  }
-  gmm <- ClusterR::GMM(yi, optk, verbose = F, seed_mode = "random_spread") # use random spread          
-  pr <- ClusterR::predict_GMM(yi, gmm$centroids, gmm$covariance_matrices, gmm$weights)
-  names(pr)[3] <- 'cluster'
-  if (0 %in% pr$cluster){
-    pr$cluster <- pr$cluster+1
-  }
-  if (silent == FALSE){
-    message('done.')
+  if (clusteralg == 'GMM'){
+    ### GMM
+    if (silent == FALSE){
+      message('doing GMM clustering...')
+    }
+    gmm <- ClusterR::GMM(yi, optk, verbose = F, seed_mode = "random_spread") # use random spread          
+    pr <- ClusterR::predict_GMM(yi, gmm$centroids, gmm$covariance_matrices, gmm$weights)
+    names(pr)[3] <- 'cluster'
+    if (0 %in% pr$cluster){
+      pr$cluster <- pr$cluster+1
+    }
+    if (silent == FALSE){
+      message('done.')
+    }
+  }else if (clusteralg == 'km'){
+    ### k means
+    if (silent == FALSE){
+      message('doing k means clustering...')
+    }
+    pr <- kmeans(yi, optk)
+    if (silent == FALSE){
+      message('done.')
+    }
   }
   
   ### display clusters using heatmap and tsne
@@ -206,12 +228,12 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
       displayClusters(A2,group=pr$cluster,fsize=1)
     }
     if (showdimred == TRUE && visualisation == 'umap'){ # method 1
-      message('running UMAP on affinity...')
+      message('running UMAP on similarity...')
       umap(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
       message('done.')
     }
     if (showdimred == TRUE && visualisation == 'tsne'){ # method 2
-      message('running t-SNE on affinity...')
+      message('running t-SNE on similarity...')
       tsne(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
       message('done.')
     }
@@ -224,7 +246,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
   
   ### return results
   results <- list('assignments'=pr$cluster,'eigenvector_analysis'=d,
-                  'K'=optk,'affinity_matrix'=A2,'eigendecomposition'=decomp)
+                  'K'=optk,'similarity_matrix'=A2,'eigendecomposition'=decomp)
   
   if (silent == FALSE){
     message('finished.')

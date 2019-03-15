@@ -1,7 +1,7 @@
-dad36c1521b299fe904f1222ed70b1fe *DESCRIPTION
-ecfa7663a729448cdb946a3b7e57e3e6 *NAMESPACE
+e659a26a36cb486e051796c18d9bf305 *DESCRIPTION
+036527cedd648c4f63451ee6aa6ce8e5 *NAMESPACE
 736de44a46e9bd6727044dc16570c599 *R/data.R
-51f83bc171833ac5de88f94504bd04d5 *R/spectrum.R
+32b9b5b58620095e8011cc44c8e5ceb0 *R/spectrum.R
 91b3c361742a2b1a02830d79780c9bc1 *R/spectrum_functions.R
 4d56b27f43079686a42ebd76b7ceafce *build/vignette.rds
 e66fc4c6fab8da22afbea5945425b65d *data/blobs.rda
@@ -10,10 +10,10 @@ f0a31b0902c970d4fb8636f8202e973e *data/circles.rda
 b55e3f25cd27cebffb65b4c1c2698495 *data/datalist
 b5a14bb4b2ac93661e0d407fd958c5e7 *data/spirals.rda
 af729a8c745d831115471eaead591b02 *inst/doc/Spectrum_vignette.R
-678e40b65c6c1dfa40dd222dc53c48bf *inst/doc/Spectrum_vignette.Rmd
-ad0d72d02134183902723bebd49b9ded *inst/doc/Spectrum_vignette.pdf
+1a93ffba9de61a8343c3af39b73265c5 *inst/doc/Spectrum_vignette.Rmd
+5a61706bd2e6787663e94221845c81ca *inst/doc/Spectrum_vignette.pdf
 6d0b13081a3c5837e412e04d01bbab4c *man/CNN_kernel_mine_b.Rd
-e66faba2647624effa39e5ca8133c092 *man/Spectrum.Rd
+2f51833a23ef425078d88081c771320d *man/Spectrum.Rd
 232f8a3bb304811a3ce8a87272974e47 *man/blobs.Rd
 4639141661f67173517ff9f2f09a3226 *man/brain.Rd
 80fd09144650aa61050855774f659157 *man/circles.Rd
@@ -23,4 +23,4 @@ c4f4becab4400377c0b03106afc6336a *man/pca.Rd
 bc471dd072dd145a0faf64481c523a12 *man/spirals.Rd
 563d8df0a7c8a7db4b57e7220125b430 *man/tsne.Rd
 5f7d23a6bc00b1774efdc6d9aac7a316 *man/umap.Rd
-678e40b65c6c1dfa40dd222dc53c48bf *vignettes/Spectrum_vignette.Rmd
+1a93ffba9de61a8343c3af39b73265c5 *vignettes/Spectrum_vignette.Rmd

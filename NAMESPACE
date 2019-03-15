@@ -18,4 +18,5 @@ importFrom("grDevices", "colorRampPalette", "dev.off", "png")
 importFrom("graphics", "image", "par", "title")
 importFrom("stats", "prcomp")
 importFrom("utils", "head")
+importFrom("stats", "kmeans")
 

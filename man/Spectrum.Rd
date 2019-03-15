@@ -2,18 +2,19 @@
 % Please edit documentation in R/spectrum.R
 \name{Spectrum}
 \alias{Spectrum}
-\title{Spectrum: Versatile ultra-fast spectral clustering for single and multi-view data}
+\title{Spectrum: Fast Adaptive Spectral Clustering for Single and Multi-view Data}
 \usage{
 Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
   diffusion = TRUE, kerneltype = c("density", "stsc"), maxk = 10,
   NN = 3, NN2 = 7, showpca = FALSE, showheatmap = FALSE,
   showdimred = FALSE, visualisation = c("umap", "tsne"), frac = 2,
-  thresh = 7, fontsize = 18, dotsize = 3)
+  thresh = 7, fontsize = 18, dotsize = 3, tunekernel = TRUE,
+  clusteralg = "GMM")
 }
 \arguments{
 \item{data}{Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.}
 
-\item{method}{Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-linear clusters)}
+\item{method}{Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters)}
 
 \item{silent}{Logical flag: whether to turn off messages}
 
@@ -23,7 +24,7 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 
 \item{kerneltype}{Character string: 'density' (default) = adaptive density aware kernel, 'stsc' = Zelnik-Manor self-tuning kernel}
 
-\item{maxk}{Numerical value: the maximum number of expected clusters (default  = 10). This is data dependent - do not set excessively high.}
+\item{maxk}{Numerical value: the maximum number of expected clusters (default  = 10). This is data dependent, do not set excessively high.}
 
 \item{NN}{Numerical value: kernel param, the number of nearest neighbours to use sigma parameters (default = 3)}
 
@@ -31,11 +32,11 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 
 \item{showpca}{Logical flag: whether to show pca when running on one view}
 
-\item{showheatmap}{Logical flag: whether to show heatmap of affinity matrix when running on one view}
+\item{showheatmap}{Logical flag: whether to show heatmap of similarity matrix when running on one view}
 
-\item{showdimred}{Logical flag: whether to show UMAP or t-SNE of final affinity matrix}
+\item{showdimred}{Logical flag: whether to show UMAP or t-SNE of final similarity matrix}
 
-\item{visualisation}{Character string: what kind of dimensionality reduction to run on the affinity matrix (umap or tsne)}
+\item{visualisation}{Character string: what kind of dimensionality reduction to run on the similarity matrix (umap or tsne)}
 
 \item{frac}{Numerical value: optk search param, fraction to find the last substantial drop (multimodality gap method param)}
 
@@ -44,21 +45,25 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 \item{fontsize}{Numerical value: controls font size of the ggplot2 plots}
 
 \item{dotsize}{Numerical value: controls the dot size of the ggplot2 plots}
+
+\item{tunekernel}{Logical flag: whether to tune the kernel, only applies for method 2}
+
+\item{clusteralg}{Character string: clustering algorithm for eigenvector matrix (GMM or km)}
 }
 \value{
 A list, containing: 
 1) cluster assignments, in the same order as input data columns 
 2) eigenvector analysis results (either eigenvalues or dip test statistics)
 3) optimal K
-4) final affinity matrix
+4) final similarity matrix
 5) eigenvectors and eigenvalues of graph Laplacian
 }
 \description{
-Spectrum is a fast adaptive spectral clustering method for single or multi-view data. Spectrum uses a new type of adaptive
+Spectrum is a self-tuning spectral clustering method for single or multi-view data. Spectrum uses a new type of adaptive
 density aware kernel that strengthens local connections in the graph. For integrating multi-view data and reducing noise
-a tensor product graph data integration and diffusion procedure is used. Spectrum contains two approaches for finding
-the number of clusters (K); the classical eigengap method and a novel multimodality gap method. The multimodality gap analyses
-the distribution of the eigenvectors of the graph Laplacian to decide K and can be used to tune the kernel.
+a tensor product graph data integration and diffusion procedure is used. Spectrum analyses eigenvector variance or distribution
+to determine the number of clusters. Spectrum is well suited for a wide range of data, including both Gaussian and non-Gaussian
+structures.
 }
 \examples{
 res <- Spectrum(brain[[1]][,1:50])
