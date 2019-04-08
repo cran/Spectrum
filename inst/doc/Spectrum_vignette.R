@@ -28,3 +28,13 @@ test4 <- Spectrum(circles,showpca=TRUE,method=2,fontsize=8,dotsize=2)
 library(Spectrum)
 test5 <- Spectrum(spirals,showpca=TRUE,method=2,fontsize=8,dotsize=2)
 
+## ----fig.width=4.5,fig.height=3------------------------------------------
+library(Spectrum)
+test6 <- Spectrum(blobs,FASP=TRUE,FASPk=300,fontsize=8,dotsize=2)
+
+## ------------------------------------------------------------------------
+names(test6)
+
+## ------------------------------------------------------------------------
+head(test6[[1]])
+

@@ -271,7 +271,7 @@ findk <- function(res,maxk=maxk,thresh=4,frac=2){
 
 ### tuner for locally adaptive density aware kernel
 kernfinder_mine <- function(data,maxk=10,fontsize=fontsize,silent=silent,
-                            showres=showres,dotsize=dotsize){ # accepts the eigenvector decomposition of L
+                            showres=showres,dotsize=dotsize){ 
   if (silent == FALSE){
     message('finding optimal NN kernel parameter by examining eigenvector distributions')
   }
@@ -281,7 +281,7 @@ kernfinder_mine <- function(data,maxk=10,fontsize=fontsize,silent=silent,
       message(paste('tuning kernel NN parameter:',param))
     }
     kern <- CNN_kernel_mine_b(data,NN=param,NN2=7)
-    kern[which(!is.finite(kern))] <- 0 ################ hack to sort out possible NaNs
+    kern[which(!is.finite(kern))] <- 0 # deal with possible NaNs
     ## calculate difference between most multimodal eigenvectors and background
     dv <- 1/sqrt(rowSums(kern)) # D = diag(1/sqrt(rowSums(A)))
     l <- dv * kern %*% diag(dv) # L = D%*%A%*%D

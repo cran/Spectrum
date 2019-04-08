@@ -7,11 +7,12 @@
 #' structures.
 #'
 #' @param data Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.
-#' @param method Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters)
+#' @param method Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters), 3 = no automatic method (see fixk param)
 #' @param maxk Numerical value: the maximum number of expected clusters (default  = 10). This is data dependent, do not set excessively high.
+#' @param fixk Numerical value: if we are just performing spectral clustering without automatic selection of K, set this parameter and method to 3
 #' @param silent Logical flag: whether to turn off messages
 #' @param showres Logical flag: whether to show the results on the screen
-#' @param diffusion Logical flag: whether to perform graph diffusion to reduce noise and boost performance, usually recommended
+#' @param diffusion Logical flag: whether to perform graph diffusion to reduce noise, recommended for method 1 only
 #' @param kerneltype Character string: 'density' (default) = adaptive density aware kernel, 'stsc' = Zelnik-Manor self-tuning kernel
 #' @param NN Numerical value: kernel param, the number of nearest neighbours to use sigma parameters (default = 3)
 #' @param NN2 Numerical value: kernel param, the number of nearest neighbours to use for the common nearest neigbours (default = 7)
@@ -25,6 +26,8 @@
 #' @param dotsize Numerical value: controls the dot size of the ggplot2 plots
 #' @param tunekernel Logical flag: whether to tune the kernel, only applies for method 2
 #' @param clusteralg Character string: clustering algorithm for eigenvector matrix (GMM or km)
+#' @param FASP Logical flag: whether to use Fast Approximate Spectral Clustering (for v. high sample numbers)
+#' @param FASPk Numerical value: the number of centroids to compute when doing FASP
 #'
 #' @return A list, containing: 
 #' 1) cluster assignments, in the same order as input data columns 
@@ -41,7 +44,8 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
                      kerneltype=c('density','stsc'),maxk=10,NN=3,NN2=7,
                      showpca=FALSE,showheatmap=FALSE,showdimred=FALSE,
                      visualisation=c('umap','tsne'),frac=2,thresh=7,
-                     fontsize=18,dotsize=3,tunekernel=TRUE,clusteralg='GMM'){
+                     fontsize=18,dotsize=3,tunekernel=TRUE,clusteralg='GMM',
+                     FASP=FALSE,FASPk=NULL,fixk=NULL){
   
   ###
   kerneltype <- match.arg(kerneltype)
@@ -53,6 +57,12 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
   }else{
     datalist <- data
   }
+  if ( length(datalist) > 1 & FASP == TRUE ) {
+    stop("Error: FASP method works for only a single view")
+  }
+  if (is.null(FASPk) == TRUE & FASP == TRUE){
+    stop("Error: FASP method requires a number of centroids to compute")
+  }
   
   ### initial messages
   if (silent == FALSE){
@@ -60,6 +70,17 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     message(paste('detected views:',length(datalist)))
     message(paste('method:',method))
     message(paste('kernel:',kerneltype))
+    if (FASP){
+      message(paste('FASP method: TRUE'))
+    }
+  }
+  
+  ### if running FASP calculate the centroids
+  if (FASP){
+    cs <- kmeans(t(datalist[[1]]),centers=FASPk)
+    csx <- cs$centers # these are the centroids to cluster
+    cas <- cs$cluster # now samples are assigned to centroids
+    datalist[[1]] <- data.frame(t(csx))
   }
   
   ### calculate individual kernels
@@ -188,7 +209,10 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     if (silent == FALSE){
       message(paste('optimal K:',optk))
     }
-  }
+  }else if (method == 3){ # no automatic K selection method
+    decomp <- eigen(l)
+    optk <- fixk
+  } 
   
   ### select optimal eigenvectors
   xi <- decomp$vectors[,1:optk]
@@ -244,9 +268,37 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     }
   }
   
-  ### return results
-  results <- list('assignments'=pr$cluster,'eigenvector_analysis'=d,
-                  'K'=optk,'similarity_matrix'=A2,'eigendecomposition'=decomp)
+  if (method != 3){
+    if (FASP){
+      ### if running FASP assign original samples to centroid clusters
+      casn <- cas
+      casn <- casn[seq_along(casn)] <- pr$cluster[as.numeric(casn[seq_along(casn)])]
+      names(casn) <- names(cas) 
+      ### return results
+      results <- list('allsample_assignments'=casn,'centroid_assignments'=pr$cluster,
+                      'eigenvector_analysis'=d,'K'=optk,'similarity_matrix'=A2,
+                      'eigendecomposition'=decomp)
+    }else{
+      ### return results
+      results <- list('assignments'=pr$cluster,'eigenvector_analysis'=d,
+                      'K'=optk,'similarity_matrix'=A2,'eigendecomposition'=decomp)
+    }
+  }else if (method == 3){
+    if (FASP){
+      ### if running FASP assign original samples to centroid clusters
+      casn <- cas
+      casn <- casn[seq_along(casn)] <- pr$cluster[as.numeric(casn[seq_along(casn)])]
+      names(casn) <- names(cas) 
+      ### return results
+      results <- list('allsample_assignments'=casn,'centroid_assignments'=pr$cluster,
+                      'K'=optk,'similarity_matrix'=A2,
+                      'eigendecomposition'=decomp)
+    }else{
+      ### return results
+      results <- list('assignments'=pr$cluster,
+                      'K'=optk,'similarity_matrix'=A2,'eigendecomposition'=decomp)
+    }
+  }
   
   if (silent == FALSE){
     message('finished.')

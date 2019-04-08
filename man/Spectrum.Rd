@@ -9,18 +9,18 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
   NN = 3, NN2 = 7, showpca = FALSE, showheatmap = FALSE,
   showdimred = FALSE, visualisation = c("umap", "tsne"), frac = 2,
   thresh = 7, fontsize = 18, dotsize = 3, tunekernel = TRUE,
-  clusteralg = "GMM")
+  clusteralg = "GMM", FASP = FALSE, FASPk = NULL, fixk = NULL)
 }
 \arguments{
 \item{data}{Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.}
 
-\item{method}{Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters)}
+\item{method}{Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters), 3 = no automatic method (see fixk param)}
 
 \item{silent}{Logical flag: whether to turn off messages}
 
 \item{showres}{Logical flag: whether to show the results on the screen}
 
-\item{diffusion}{Logical flag: whether to perform graph diffusion to reduce noise and boost performance, usually recommended}
+\item{diffusion}{Logical flag: whether to perform graph diffusion to reduce noise, recommended for method 1 only}
 
 \item{kerneltype}{Character string: 'density' (default) = adaptive density aware kernel, 'stsc' = Zelnik-Manor self-tuning kernel}
 
@@ -49,6 +49,12 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 \item{tunekernel}{Logical flag: whether to tune the kernel, only applies for method 2}
 
 \item{clusteralg}{Character string: clustering algorithm for eigenvector matrix (GMM or km)}
+
+\item{FASP}{Logical flag: whether to use Fast Approximate Spectral Clustering (for v. high sample numbers)}
+
+\item{FASPk}{Numerical value: the number of centroids to compute when doing FASP}
+
+\item{fixk}{Numerical value: if we are just performing spectral clustering without automatic selection of K, set this parameter and method to 3}
 }
 \value{
 A list, containing: 
