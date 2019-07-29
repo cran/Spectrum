@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Spectrum is a fast adaptive spectral clustering method for single or multi-view data. Spectrum uses a new type of density aware kernel that strengthens local connections in dense regions in the graph. It uses a recently developed tensor product graph data integration and diffusion procedure for integrating different data sources and reducing noise. Spectrum contains the classical eigengap or new multimodality gap heuristic for determining the number of clusters (K). Spectrum was developed to cluster single and multi-omic data for precision medicine and molecular biology. However, the method is sufficiently flexible so it can generalise well to a wide range of Gaussian and non-Gaussian structures with automatic selection of K.
+Spectrum is a fast adaptive spectral clustering method for single or multi-view data. Spectrum uses a density-aware kernel that strengthens local connections in dense regions in the graph. It uses a recently developed tensor product graph data integration and diffusion procedure for integrating different data sources and reducing noise (Shu et al., 2016). Spectrum contains the classical eigengap or our multimodality gap heuristic for determining the number of clusters (K). Spectrum was developed to cluster single and multi-omic data for precision medicine and molecular biology. However, the method is sufficiently flexible so it can generalise well to a wide range of Gaussian and non-Gaussian structures with automatic selection of K.
 
 ## Contents
 
@@ -47,7 +47,7 @@ Spectrum is a fast adaptive spectral clustering method for single or multi-view 
 
 ## 2. Single-view clustering: Gaussian blobs
 
-Here we cluster a simulated dataset consisting of several Gaussian blobs. This could represent a number of real world problems, for example, clustering a single omic' data platform (RNA-seq, miRNA-seq, protein, or single cell RNA-seq). Method 1 is set as the default when using Spectrum which uses the eigengap method to find K. We recommend this for most Gaussian clustering tasks. Method 2 which uses the new multimodality gap method which can detect K for non-Gaussian structures as well.
+Here we cluster a simulated dataset consisting of several Gaussian blobs. This could represent a number of real world problems, for example, clustering a single omic data platform (RNA-seq, miRNA-seq, protein, or single cell RNA-seq). Method 1 is set as the default when using Spectrum which uses the eigengap method to find K. We recommend this for most Gaussian clustering tasks. Method 2 which uses the multimodality gap method which can detect K for non-Gaussian structures as well.
 
 The first plot will show the eigenvalues, where the greatest gap is used to decide K, the second plot shows the results from running UMAP on the similarity matrix. We could also run a t-SNE on the similarity matrix at this stage, by changing the 'visualisation' parameter or a PCA by setting the 'showpca' parameter to TRUE. 
 
@@ -76,7 +76,7 @@ test2 <- Spectrum(RNAseq,showdimred=TRUE,fontsize=8,dotsize=2)
 
 ## 4. Single-view clustering: Brain cancer RNA-seq clustering a range of K
 
-There will be some cases where the user would like Spectrum to return clustering assignments each K in a range so the results can be compared with other variables such as, histology, survival time, etc. There is an extra parameter that can be used for this.
+There will be some cases where the user would like Spectrum to return clustering assignments for each K in a range so the results can be compared with other variables such as, histology, survival time, etc. There is an extra parameter that can be used for this.
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
@@ -94,7 +94,7 @@ head(test3[[2]]$assignments)
 
 Here we cluster multi-omic cancer data with three different platforms (or views): mRNA, miRNA, and protein expression data. This example uses Spectrum's tensor product graph data integration method to combine heterogeneous data sources. 
 
-The first plot will show the eigenvalues where the greatest gap in used to decide K, the second plot shows the results from running UMAP on the combined similarity matrix. Running UMAP or t-SNE on the integrated similarity matrix provides a new way of multi-omic data visualisation.
+The first plot will show the eigenvalues where the greatest gap in used to decide K, the second plot shows the results from running UMAP on the combined similarity matrix. 
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
@@ -105,9 +105,7 @@ test4 <- Spectrum(brain,showdimred=TRUE,fontsize=8,dotsize=2)
 
 For analysing non-Gaussian structures and determining K automatically, it is much better to use our method that examines the multimodality of the eigenvectors and searches for the last substantial drop. This method, by default, also tunes the kernel by examining the multimodality gaps, although this is not always necessary. The method can handle Gaussian clusters too, multimodality is quantified using the well known dip-test statistic (Hartigan et al., 1985).
 
-The first plot shows the results from tuning the kernel's nearest neighbour parameter (NN). D refers to the greatest difference in dip-test statistics between any consecutive eigenvectors of the graph Laplacian for that value of NN. Spectrum automatically searches for a minimum (corresponding to the maximum drop in multimodality) to find the optimal kernel. In the next plot, we have the dip test statistics (Z) which measure the multimodality of the eigenvectors. 
-
-When the multimodality is higher, the eigenvectors are more informative and represent blocks of the data's similarity matrix. Thus, when there is a big gap this may correspond to the optimal K as we have no more blocks to find. However, Spectrum has its own greedy algorithm to search for 'the last substantial gap' instead of the greatest gap. This is because searching for the greatest gap sometimes gets stuck in local minima without including all informative eigenvectors. The parameters for the search can be adjusted with the 'thresh' and 'frac' parameters. The last plot shown here is PCA to visualise the data, run just on the input data for the user.
+In the plot, we have the dip test statistics (Z) which measure the multimodality of the eigenvectors. When the multimodality is higher, the eigenvectors are more informative and represent blocks of the data's similarity matrix. Thus, when there is a big gap this may correspond to the optimal K as we have no more blocks to find. However, Spectrum has its own greedy algorithm to search for 'the last substantial gap' instead of the greatest gap. This is because searching for the greatest gap sometimes gets stuck in local minima without including all informative eigenvectors. The parameters for the search can be adjusted with the 'thresh' and 'frac' parameters. The last plot shown here is PCA to visualise the data, run just on the input data for the user.
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
@@ -116,11 +114,15 @@ test5 <- Spectrum(circles,showpca=TRUE,method=2,fontsize=8,dotsize=2)
 
 ## 7. Single-view clustering: Non-Gaussian data, spirals
 
-Same as the last example, but for the spirals dataset. In this example, kernel tuning is required to detect the optimal K.
+Same as the last example, but for the spirals dataset. 
+
+In this example, kernel tuning is required to detect the optimal K. Kernel tuning using our method is best saved for datasets containing unusual shapes (e.g spirals, letters, etc) that are not well recognised with the standard kernel parameters. It does add significant computational time.
+
+The kernel tuning plot shows the results from tuning the kernel's nearest neighbour parameter (NN). D refers to the greatest difference in dip-test statistics between any consecutive eigenvectors of the graph Laplacian for that value of NN. Spectrum automatically searches for a minimum (corresponding to the maximum drop in multimodality) to find the optimal kernel. 
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
-test6 <- Spectrum(spirals,showpca=TRUE,method=2,fontsize=8,dotsize=2)
+test6 <- Spectrum(spirals,showpca=TRUE,method=2,tunekernel=TRUE,fontsize=8,dotsize=2)
 ```
 
 ## 8. Ultra-fast single-view clustering: Gaussian blobs II
@@ -148,44 +150,48 @@ head(test7[[1]])
 
 Generally speaking, Spectrum is set up to handle a wide range of data automatically with its self-tuning kernel on the default settings. However, we provide the following advice in more specific circumstances.
 
-- For a lot of noisy Gaussian data e.g. RNA-seq, we have a preference for method 1 which is the eigengap. 
-
-- For data containing non-Gaussian clusters; use method 2, which can automatically detect K for these structures. In some cases, the greedy search parameters, 'thresh' and 'frac', which define the cut-offs for searching for the last substantial gap in multimodality, may require manually changing for the data type. 
+- For a lot of noisy Gaussian data, e.g. RNA-seq, protein arrays, etc, we have a preference for method 1 which is the eigengap. 
 
 - For very high numbers of samples; switch FASP mode on and set 'FASPk' to e.g. 500-10,000. The 'FASPk' parameter should be high enough to get a good representation of the data.
-
-- Kernel tuning for method 2 is optional, it can help, but for a large dataset it may be too time consuming.
-
-- For method 2, we tested the method on several single cell RNA-seq datasets and it performs much better without graph diffusion. So diffusion should be test to FALSE when running on this data type.
 
 - Although in our experiments we found our adaptive density aware kernel superior to the classic Zelnik-Manor et al. (2005) self tuning kernel, the user might want to experiment on their data with the Zelnik-Manor kernel (stsc) also included in Spectrum.
 
 - The kernel parameters N and NN2 can be experimented with which control the number of nearest neighbours used when calculating the local sigma or density parameter. However, the default parameters have been tested with a wide range of real and simulated data and generalise well.
 
+- For data containing non-Gaussian clusters; use method 2, which can automatically detect K for these structures. In some cases, the greedy search parameters, 'thresh' and 'frac', which define the cut-offs for searching for the last substantial gap in multimodality, may require manually changing for the data type. 
+
+- Kernel tuning for method 2 is optional, it can help for complex structures, but for a large dataset it may be too time consuming. Especially for omic data we suggest not to use this mode.
+
+- For method 2, we tested the method on several single cell RNA-seq datasets and it performs much better without graph diffusion. So diffusion should be test to FALSE when running on this data type.
+
 ## 10. Code for heatmaps
 
-For users looking to make a heatmap from the Spectrum assignment output, the following code will help. We just need to order the input data's columns according to the clustering assignments. Then, when you make the heatmap with samples as columns, do not cluster the columns because this has been done already, and use the assignments as an annotation track to visualise them.
+For users that want to make a heatmap from the Spectrum assignment output, the following code will help. We just need to order the input data's columns according to the clustering assignments. Then, when you make the heatmap with samples as columns, do not cluster the columns because this has been done already, and use the assignments as an annotation track to visualise them.
 
 ```{r}
-## 1. run my clustering algorithm yielding assignments, e.g. 1,2,2,1,2,2,1,2,1,2
-# algorithm function, e.g. Spectrum
-## 2. reorder data according to any clustering algorithm
-ind <- sort(as.vector(test2$assignments),index.return=TRUE) ## get the indices required for sorting
-datax <- RNAseq[,ind$ix] ## order the original data according to the clustering assignments
-#annonx <- meta[ind$ix,] ## order the meta data for the heatmap function
+## 1. run my clustering algorithm yielding assignments in vector, e.g. 1,2,2,1,2,2...
+## 2. reorder data according to assignments
+ind <- sort(as.vector(test2$assignments),index.return=TRUE)
+datax <- RNAseq[,ind$ix] ## order the original data 
+#annonx <- meta[ind$ix,] ## order the meta data
 #annonx$cluster <- ind$x ## add the cluster to the meta data
-## 3. do heatmap your heatmap
+## 3. do heatmap 
+# insert your favourite heatmap function
 ```
 
 ## 11. Closing comments
 
-Spectrum is an unique assembly of spectral clustering techniques designed to serve a broad community. Included are both innovations for the field, such as the adaptive density aware kernel and the multimodality gap procedure, as well as implementations of others state-of-the-art methods. As we have demonstrated in this vignette, it is suitable for a wide range of clustering tasks.
+Spectrum is an unique assembly of spectral clustering techniques designed to serve a broad community. Included are both innovations for the field, such as the adaptive density aware kernel and the multimodality gap procedure, as well as implementations of others state-of-the-art methods. Spectrum is suitable for a wide range of clustering tasks. 
+
+We recommend Spectrum be used in conjuction with dimensionality reduction methods to confirm the structure and taking into account our recommendations in the parameter settings section of the vignette. 
 
 ## 12. References
 
 Hartigan, John A., and Pamela M. Hartigan. "The dip test of unimodality." The annals of Statistics 13.1 (1985): 70-84.
 
 Yan, Donghui, Ling Huang, and Michael I. Jordan. "Fast approximate spectral clustering." Proceedings of the 15th ACM SIGKDD international conference on Knowledge discovery and data mining. ACM, 2009.
+
+Shu, Le, and Longin Jan Latecki. "Integration of single-view graphs with diffusion of tensor product graphs for multi-view spectral clustering." Asian Conference on Machine Learning. 2016.
 
 Zelnik-Manor, Lihi, and Pietro Perona. "Self-tuning spectral clustering." Advances in neural information processing systems. 2005.
 

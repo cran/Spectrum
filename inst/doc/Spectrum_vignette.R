@@ -34,7 +34,7 @@ test5 <- Spectrum(circles,showpca=TRUE,method=2,fontsize=8,dotsize=2)
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
-test6 <- Spectrum(spirals,showpca=TRUE,method=2,fontsize=8,dotsize=2)
+test6 <- Spectrum(spirals,showpca=TRUE,method=2,tunekernel=TRUE,fontsize=8,dotsize=2)
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
@@ -47,12 +47,12 @@ names(test7)
 head(test7[[1]])
 
 ## ------------------------------------------------------------------------
-## 1. run my clustering algorithm yielding assignments, e.g. 1,2,2,1,2,2,1,2,1,2
-# algorithm function, e.g. Spectrum
-## 2. reorder data according to any clustering algorithm
-ind <- sort(as.vector(test2$assignments),index.return=TRUE) ## get the indices required for sorting
-datax <- RNAseq[,ind$ix] ## order the original data according to the clustering assignments
-#annonx <- meta[ind$ix,] ## order the meta data for the heatmap function
+## 1. run my clustering algorithm yielding assignments in vector, e.g. 1,2,2,1,2,2...
+## 2. reorder data according to assignments
+ind <- sort(as.vector(test2$assignments),index.return=TRUE)
+datax <- RNAseq[,ind$ix] ## order the original data 
+#annonx <- meta[ind$ix,] ## order the meta data
 #annonx$cluster <- ind$x ## add the cluster to the meta data
-## 3. do heatmap your heatmap
+## 3. do heatmap 
+# insert your favourite heatmap function
 

@@ -48,7 +48,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
                      kerneltype=c('density','stsc'),maxk=10,NN=3,NN2=7,
                      showpca=FALSE,showheatmap=FALSE,showdimred=FALSE,
                      visualisation=c('umap','tsne'),frac=2,thresh=7,
-                     fontsize=18,dotsize=3,tunekernel=TRUE,clusteralg='GMM',
+                     fontsize=18,dotsize=3,tunekernel=FALSE,clusteralg='GMM',
                      FASP=FALSE,FASPk=NULL,fixk=NULL,krangemax=10,
                      runrange=FALSE,diffusion_iters=4,KNNs_p=10){
   
