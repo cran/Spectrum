@@ -6,7 +6,7 @@ knitr::opts_chunk$set(
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
-test1 <- Spectrum(blobs,showdimred=TRUE,fontsize=8,dotsize=2)
+test1 <- Spectrum(blobs,showpca=TRUE,fontsize=8,dotsize=2)
 
 ## ------------------------------------------------------------------------
 names(test1)
@@ -27,6 +27,15 @@ head(test3[[2]]$assignments)
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
 test4 <- Spectrum(brain,showdimred=TRUE,fontsize=8,dotsize=2)
+
+## ----fig.width=4.5,fig.height=3------------------------------------------
+library(Spectrum)
+brain1 <- brain[[1]]
+brain2 <- brain[[2]]
+brain3 <- brain[[3]]
+brain1 <- brain1[,-5:-10]
+brain_m <- list(brain1,brain2,brain3)
+test4 <- Spectrum(brain_m,missing=TRUE,fontsize=8,dotsize=2)
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)

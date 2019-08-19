@@ -1,10 +1,10 @@
 #' Spectrum: Fast Adaptive Spectral Clustering for Single and Multi-view Data
 #'
 #' Spectrum is a self-tuning spectral clustering method for single or multi-view data. Spectrum uses a new type of adaptive
-#' density aware kernel that strengthens local connections in the graph. For integrating multi-view data and reducing noise
-#' a tensor product graph data integration and diffusion procedure is used. Spectrum analyses eigenvector variance or distribution
-#' to determine the number of clusters. Spectrum is well suited for a wide range of data, including both Gaussian and non-Gaussian
-#' structures.
+#' density aware kernel that strengthens connections between points that share common nearest neighbours in the graph. 
+#' For integrating multi-view data and reducing noise a tensor product graph data integration and diffusion procedure is used. 
+#' Spectrum analyses eigenvector variance or distribution to determine the number of clusters. Spectrum is well suited for a wide 
+#' range of data, including both Gaussian and non-Gaussian structures.
 #'
 #' @param data Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.
 #' @param method Numerical value: 1 = default eigengap method (Gaussian clusters), 2 = multimodality gap method (Gaussian/ non-Gaussian clusters), 3 = no automatic method (see fixk param)
@@ -32,6 +32,7 @@
 #' @param runrange Logical flag: whether to run a range of K or not (default=FALSE), puts Kth results into Kth element of list
 #' @param diffusion_iters Numerical value: number of diffusion iterations for the graph (default=5)
 #' @param KNNs_p Numerical value: number of KNNs when making KNN graph (default=10)
+#' @param missing Logical flag: whether to impute missing data in multi-view analysis
 #'
 #' @return A list, containing: 
 #' 1) cluster assignments, in the same order as input data columns 
@@ -50,7 +51,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
                      visualisation=c('umap','tsne'),frac=2,thresh=7,
                      fontsize=18,dotsize=3,tunekernel=FALSE,clusteralg='GMM',
                      FASP=FALSE,FASPk=NULL,fixk=NULL,krangemax=10,
-                     runrange=FALSE,diffusion_iters=4,KNNs_p=10){
+                     runrange=FALSE,diffusion_iters=4,KNNs_p=10,missing=FALSE){
   
   ###
   kerneltype <- match.arg(kerneltype)
@@ -81,13 +82,11 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
     message(paste('detected views:',length(datalist)))
     message(paste('method:',method))
     message(paste('kernel:',kerneltype))
-    if (FASP){
-      message(paste('FASP method: TRUE'))
-    }
   }
   
   ### if running FASP calculate the centroids
   if (FASP){
+    message('running with FASP data compression')
     cs <- kmeans(t(datalist[[1]]),centers=FASPk)
     csx <- cs$centers # these are the centroids to cluster
     cas <- cs$cluster # now samples are assigned to centroids
@@ -120,15 +119,23 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
           NN <- 3
         }
       }
-      kerneli <- CNN_kernel_mine_b(datalist[[platform]],NN=NN,NN2=7)
+      kerneli <- CNN_kernel(datalist[[platform]],NN=NN,NN2=7)
     }
     if (silent == FALSE){
       message('done.')
     }
     ### save kernel in list
-    colnames(kerneli) <- colnames(datalist[[1]])
-    row.names(kerneli) <- colnames(datalist[[1]])
+    colnames(kerneli) <- colnames(datalist[[platform]])
+    row.names(kerneli) <- colnames(datalist[[platform]])
     kernellist[[platform]] <- kerneli
+  }
+  
+  ### impute missing data
+  if (missing){
+    message('imputing missing data...')
+    kernellist <- harmonise_ids(kernellist)
+    kernellist <- mean_imputation(kernellist)
+    message('done.')
   }
   
   ### fuse and truncate/ make KNN graph (both)

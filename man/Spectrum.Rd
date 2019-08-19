@@ -11,7 +11,7 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
   thresh = 7, fontsize = 18, dotsize = 3, tunekernel = FALSE,
   clusteralg = "GMM", FASP = FALSE, FASPk = NULL, fixk = NULL,
   krangemax = 10, runrange = FALSE, diffusion_iters = 4,
-  KNNs_p = 10)
+  KNNs_p = 10, missing = FALSE)
 }
 \arguments{
 \item{data}{Data frame or list of data frames: contains the data with samples as columns and rows as features. For multi-view data a list of dataframes is to be supplied with the samples in the same order.}
@@ -65,6 +65,8 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 \item{diffusion_iters}{Numerical value: number of diffusion iterations for the graph (default=5)}
 
 \item{KNNs_p}{Numerical value: number of KNNs when making KNN graph (default=10)}
+
+\item{missing}{Logical flag: whether to impute missing data in multi-view analysis}
 }
 \value{
 A list, containing: 
@@ -76,10 +78,10 @@ A list, containing:
 }
 \description{
 Spectrum is a self-tuning spectral clustering method for single or multi-view data. Spectrum uses a new type of adaptive
-density aware kernel that strengthens local connections in the graph. For integrating multi-view data and reducing noise
-a tensor product graph data integration and diffusion procedure is used. Spectrum analyses eigenvector variance or distribution
-to determine the number of clusters. Spectrum is well suited for a wide range of data, including both Gaussian and non-Gaussian
-structures.
+density aware kernel that strengthens connections between points that share common nearest neighbours in the graph. 
+For integrating multi-view data and reducing noise a tensor product graph data integration and diffusion procedure is used. 
+Spectrum analyses eigenvector variance or distribution to determine the number of clusters. Spectrum is well suited for a wide 
+range of data, including both Gaussian and non-Gaussian structures.
 }
 \examples{
 res <- Spectrum(brain[[1]][,1:50])
