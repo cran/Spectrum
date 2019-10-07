@@ -55,6 +55,22 @@ names(test7)
 ## ------------------------------------------------------------------------
 head(test7[[1]])
 
+## ----fig.width=4.5,fig.height=3------------------------------------------
+library(Spectrum)
+s <- sigma_finder(blobs)
+s1 <- ng_kernel(blobs,sigma=s)
+e1 <- estimate_k(s1,showplots=FALSE)
+r <- cluster_similarity(s1,k=8,clusteralg='GMM')
+
+## ----fig.width=4.5,fig.height=3------------------------------------------
+library(Spectrum)
+s1 <- CNN_kernel(blobs)
+s2 <- CNN_kernel(blobs)
+klist <- list(s1,s2)
+x <- integrate_similarity_matrices(klist)
+e1 <- estimate_k(x,showplots=FALSE)
+r <- cluster_similarity(x,k=8,clusteralg='GMM')
+
 ## ------------------------------------------------------------------------
 ## 1. run my clustering algorithm yielding assignments in vector, e.g. 1,2,2,1,2,2...
 ## 2. reorder data according to assignments
