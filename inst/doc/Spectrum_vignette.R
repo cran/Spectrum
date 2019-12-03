@@ -14,7 +14,9 @@ names(test1)
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
 RNAseq <- brain[[1]]
-test2 <- Spectrum(RNAseq,showdimred=TRUE,fontsize=8,dotsize=2)
+test2 <- Spectrum(RNAseq,fontsize=8,dotsize=2)
+pca(test2$similarity_matrix,labels=test2$assignments,axistextsize=8,
+           legendtextsize=8,dotsize=2)
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
@@ -26,7 +28,9 @@ head(test3[[2]]$assignments)
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)
-test4 <- Spectrum(brain,showdimred=TRUE,fontsize=8,dotsize=2)
+test4 <- Spectrum(brain,fontsize=8,dotsize=2)
+kernel_pca(test4$similarity_matrix,labels=test4$assignments,
+           axistextsize=8,legendtextsize=8,dotsize=1.5)
 
 ## ----fig.width=4.5,fig.height=3------------------------------------------
 library(Spectrum)

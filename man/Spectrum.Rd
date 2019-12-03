@@ -6,9 +6,8 @@
 \usage{
 Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
   diffusion = TRUE, kerneltype = c("density", "stsc"), maxk = 10,
-  NN = 3, NN2 = 7, showpca = FALSE, showheatmap = FALSE,
-  showdimred = FALSE, visualisation = c("umap", "tsne"), frac = 2,
-  thresh = 7, fontsize = 18, dotsize = 3, tunekernel = FALSE,
+  NN = 3, NN2 = 7, showpca = FALSE, frac = 2, thresh = 7,
+  fontsize = 18, dotsize = 3, tunekernel = FALSE,
   clusteralg = "GMM", FASP = FALSE, FASPk = NULL, fixk = NULL,
   krangemax = 10, runrange = FALSE, diffusion_iters = 4,
   KNNs_p = 10, missing = FALSE)
@@ -33,12 +32,6 @@ Spectrum(data, method = 1, silent = FALSE, showres = TRUE,
 \item{NN2}{Numerical value: kernel param, the number of nearest neighbours to use for the common nearest neigbours (default = 7)}
 
 \item{showpca}{Logical flag: whether to show pca when running on one view}
-
-\item{showheatmap}{Logical flag: whether to show heatmap of similarity matrix when running on one view}
-
-\item{showdimred}{Logical flag: whether to show UMAP or t-SNE of final similarity matrix}
-
-\item{visualisation}{Character string: what kind of dimensionality reduction to run on the similarity matrix (umap or tsne)}
 
 \item{frac}{Numerical value: optk search param, fraction to find the last substantial drop (multimodality gap method param)}
 

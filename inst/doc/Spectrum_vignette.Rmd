@@ -44,15 +44,15 @@ Spectrum is a fast adaptive spectral clustering method for single or multi-view 
 - Data must have points (samples to cluster) as columns and rows as features
 - Data should be normalised appropiately so the points are comparable
 - Data should be transformed appropiately so different features are comparable
-- Z-score normalisation is not necessary
-- Data must be on a continuous or binary scale
-- Multi-view data must have the same number of points in each view and column IDs must be in the same order
+- Z-score normalisation is not necessary for data on the same scale, e.g. RNA-seq can be inserted as log2(CPM).
+- Data must be on a continuous (or binary scale)
+- For non missing multi-view analysis data must have the same number of points in each view and column IDs must be in the same order
 - For ultra-fast mode this is only for single-view data
 - Multi-view data imputation requires at least one view with data
 
 ## 2. Quick start parameter settings
 
-- For most users, we recommend the default settings which runs the main algorithm (method=1)
+- For most users, we recommend the default settings which runs the main Spectrum algorithm (method=1)
 - For non-Gaussian structures, such as complex shapes, use method=2
 - For spectral clustering without finding K automatically, use method=3 and set the fixk parameter
 - For more than 10,000 points, Spectrum can be set in ultra-fast mode, see Section 10
@@ -62,7 +62,7 @@ Spectrum is a fast adaptive spectral clustering method for single or multi-view 
 
 Here we cluster a simulated dataset consisting of several Gaussian blobs. This could represent a number of real world problems, for example, clustering a single omic data platform (RNA-seq, miRNA-seq, protein, or single cell RNA-seq). Method 1 is set as the default when using Spectrum which uses the eigengap method to find K. We recommend this for most Gaussian clustering tasks. Method 2 which uses the multimodality gap method which can detect K for non-Gaussian structures as well.
 
-The first plot will show the eigenvalues, where the greatest gap is used to decide K, the second plot shows PCA results. Spectrum can also run t-SNE or UMAP on the similarity matrix as an alternative data visualisation technique (type ?Spectrum). 
+The first plot will show the eigenvalues, where the greatest gap is used to decide K, the second plot shows PCA results.
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
@@ -79,12 +79,14 @@ names(test1)
 
 Here we cluster a brain cancer RNA-seq dataset with 150 points again using the eigengap method. The point size has been reduced because of the CRAN package guidelines. 
 
-The first plot will show the eigenvalues where the greatest gap in used to decide K, the second plot shows the results from running UMAP on the diffused similarity matrix. 
+The first plot will show the eigenvalues where the greatest gap in used to decide K, the second plot shows the a PCA with the cluster assignments labelled.
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
 RNAseq <- brain[[1]]
-test2 <- Spectrum(RNAseq,showdimred=TRUE,fontsize=8,dotsize=2)
+test2 <- Spectrum(RNAseq,fontsize=8,dotsize=2)
+pca(test2$similarity_matrix,labels=test2$assignments,axistextsize=8,
+           legendtextsize=8,dotsize=2)
 ```
 
 ## 5. Single-view clustering: Brain cancer RNA-seq clustering a range of K
@@ -107,11 +109,13 @@ head(test3[[2]]$assignments)
 
 Here we cluster multi-omic cancer data with three different platforms (or views): mRNA, miRNA, and protein expression data. This example uses Spectrum's tensor product graph data integration method to combine heterogeneous data sources. 
 
-The first plot will show the eigenvalues where the greatest gap in used to decide K, the second plot shows the results from running UMAP on the combined similarity matrix. 
+The first plot will show the eigenvalues where the greatest gap in used to decide K, the second plot shows the results from doing a kernel PCA on the integrated similarity matrix.
 
 ```{r,fig.width=4.5,fig.height=3}
 library(Spectrum)
-test4 <- Spectrum(brain,showdimred=TRUE,fontsize=8,dotsize=2)
+test4 <- Spectrum(brain,fontsize=8,dotsize=2)
+kernel_pca(test4$similarity_matrix,labels=test4$assignments,
+           axistextsize=8,legendtextsize=8,dotsize=1.5)
 ```
 
 ## 7. Multi-view clustering: Brain cancer multi-omics with missing data

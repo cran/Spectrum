@@ -17,9 +17,6 @@
 #' @param NN Numerical value: kernel param, the number of nearest neighbours to use sigma parameters (default=3)
 #' @param NN2 Numerical value: kernel param, the number of nearest neighbours to use for the common nearest neigbours (default = 7)
 #' @param showpca Logical flag: whether to show pca when running on one view
-#' @param showheatmap Logical flag: whether to show heatmap of similarity matrix when running on one view
-#' @param showdimred Logical flag: whether to show UMAP or t-SNE of final similarity matrix
-#' @param visualisation Character string: what kind of dimensionality reduction to run on the similarity matrix (umap or tsne)
 #' @param frac Numerical value: optk search param, fraction to find the last substantial drop (multimodality gap method param)
 #' @param thresh Numerical value: optk search param, how many points ahead to keep searching (multimodality gap method param)
 #' @param fontsize Numerical value: controls font size of the ggplot2 plots
@@ -47,15 +44,13 @@
 
 Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
                      kerneltype=c('density','stsc'),maxk=10,NN=3,NN2=7,
-                     showpca=FALSE,showheatmap=FALSE,showdimred=FALSE,
-                     visualisation=c('umap','tsne'),frac=2,thresh=7,
+                     showpca=FALSE,frac=2,thresh=7,
                      fontsize=18,dotsize=3,tunekernel=FALSE,clusteralg='GMM',
                      FASP=FALSE,FASPk=NULL,fixk=NULL,krangemax=10,
                      runrange=FALSE,diffusion_iters=4,KNNs_p=10,missing=FALSE){
   
   ###
   kerneltype <- match.arg(kerneltype)
-  visualisation <- match.arg(visualisation)
   
   ### error handling
   if (class(data) != 'list'){
@@ -239,7 +234,6 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
       yi <- xi/sqrt(rowSums(xi^2))
       # replace NA values (row = 0) with zeros
       yi[which(!is.finite(yi))] <- 0
-      
       if (clusteralg == 'GMM'){
         ### GMM
         gmm <- ClusterR::GMM(yi, tk, verbose = F, seed_mode = "random_spread") # use random spread          
@@ -256,12 +250,6 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
         pr <- kmeans(yi, tk)
         if (silent == FALSE){
           message('clustered.')
-        }
-      }
-      #
-      if (showres == TRUE){ # for any number of data sources
-        if (showheatmap == TRUE){
-          displayClusters(A2,group=pr$cluster,fsize=1)
         }
       }
       #
@@ -316,22 +304,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
       }
     }
     
-    ### display clusters using heatmap and tsne
-    if (showres == TRUE){ # for any number of data sources
-      if (showheatmap == TRUE){
-        displayClusters(A2,group=pr$cluster,fsize=1)
-      }
-      if (showdimred == TRUE && visualisation == 'umap'){ # method 1
-        message('running UMAP on similarity matrix...')
-        umap(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
-        message('done.')
-      }
-      if (showdimred == TRUE && visualisation == 'tsne'){ # method 2
-        message('running t-SNE on similarity matrix...')
-        tsne(A2,labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
-        message('done.')
-      }
-    }
+    ### display clusters
     if (length(datalist) == 1 && showres == TRUE){ # for one data source only
       if (showpca == TRUE){
         pca(datalist[[1]],labels=as.factor(pr$cluster),axistextsize=fontsize,legendtextsize=fontsize,dotsize=dotsize)
