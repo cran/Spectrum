@@ -53,7 +53,7 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
   kerneltype <- match.arg(kerneltype)
   
   ### error handling
-  if (class(data) != 'list'){
+  if (!inherits(data,'list')){
     datalist <- list(data) # just a single data source
   }else{
     datalist <- data
@@ -116,8 +116,8 @@ Spectrum <- function(data,method=1,silent=FALSE,showres=TRUE,diffusion=TRUE,
       message('done.')
     }
     ### save kernel in list
-    colnames(kerneli) <- colnames(datalist[[platform]])
-    row.names(kerneli) <- colnames(datalist[[platform]])
+    #colnames(kerneli) <- colnames(datalist[[platform]])
+    #row.names(kerneli) <- colnames(datalist[[platform]])
     kernellist[[platform]] <- kerneli
   }
   

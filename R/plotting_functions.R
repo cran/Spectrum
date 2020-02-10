@@ -100,14 +100,14 @@ kernel_pca <- function(datam, labels = FALSE, axistextsize = 18, legendtextsize 
   # do plot
   scores <- data.frame(ret)
   colnames(scores)[1:2] <- c('PC1','PC2')
-  p1 <- ggplot(data = scores, aes(x = PC1, y = PC2) ) + geom_point(aes(colour = factor(labels)),size=dotsize) + 
-    theme_bw() + 
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          axis.text.y = element_text(size = axistextsize, colour = 'black'),
-          axis.text.x = element_text(size = axistextsize, colour = 'black'),
-          axis.title.x = element_text(size = axistextsize),
-          axis.title.y = element_text(size = axistextsize),
-          legend.title = element_text(size = legendtextsize),
-          legend.text = element_text(size = legendtextsize)) 
+  p1 <- ggplot2::ggplot(data = scores, aes(x = PC1, y = PC2) ) + ggplot2::geom_point(aes(colour = factor(labels)),size=dotsize) + 
+    ggplot2::theme_bw() + 
+    ggplot2::theme(panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank(),
+          axis.text.y = ggplot2::element_text(size = axistextsize, colour = 'black'),
+          axis.text.x = ggplot2::element_text(size = axistextsize, colour = 'black'),
+          axis.title.x = ggplot2::element_text(size = axistextsize),
+          axis.title.y = ggplot2::element_text(size = axistextsize),
+          legend.title = ggplot2::element_text(size = legendtextsize),
+          legend.text = ggplot2::element_text(size = legendtextsize)) 
   return(p1)
 }

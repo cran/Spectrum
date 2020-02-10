@@ -1,10 +1,10 @@
-92156fa6d1378d58894fa3c4d1ed00ea *DESCRIPTION
+3563e6a1a7ff651e0d4dd3193dfd7be1 *DESCRIPTION
 4e5c451cf94003c315ad208f55580a04 *NAMESPACE
 e9068238122ec9b47c7355a1e98e0a9c *R/core_functions.R
 70e73173cc468b063fb1c12ff10d4ff8 *R/data.R
-3cacc4354ae21da2edc4210320035c49 *R/kernel_functions.R
-6957006e004c82a019fdf65e43502164 *R/plotting_functions.R
-4845ccd919bf1be72de5fccc707ce263 *R/spectrum.R
+0fd3d77879ba10df9c72ba0985bba254 *R/kernel_functions.R
+173186128f7b1afbdc95cf6b062c9bfa *R/plotting_functions.R
+d359a0e2733c0daad8d01793c331b4eb *R/spectrum.R
 1e637e11809f8c3060744eb5c20b28c0 *build/vignette.rds
 e66fc4c6fab8da22afbea5945425b65d *data/blobs.rda
 35892fc54f4dbab7f26a7a62740ac328 *data/brain.rda
@@ -15,7 +15,7 @@ f8b4e130b8c1410642ee5df4e321600c *data/misslfilled.rda
 b5a14bb4b2ac93661e0d407fd958c5e7 *data/spirals.rda
 eec7eae53c790b122309662bb88a79ac *inst/doc/Spectrum_vignette.R
 72d5a6b0fa221b4469b479a4ca9cc33f *inst/doc/Spectrum_vignette.Rmd
-e6718c95cf93453ea183b160e7f70475 *inst/doc/Spectrum_vignette.pdf
+b3ac072d54be01514ff37422d4c9ef0e *inst/doc/Spectrum_vignette.pdf
 92f7dd99fa2a94ee7f33e4417d4ded61 *man/CNN_kernel.Rd
 675edeb45eb11a3a3eae9ff2e3cededf *man/Spectrum.Rd
 232f8a3bb304811a3ce8a87272974e47 *man/blobs.Rd

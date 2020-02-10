@@ -49,6 +49,9 @@ CNN_kernel <- function(mat, NN = 3, NN2 = 7) {
   # reflect, diag = 1
   out <- pmax(out, t(out), na.rm = TRUE)
   diag(out) <- 1
+  ## add colnames back on
+  colnames(out) <- colnames(mat)
+  row.names(out) <- colnames(mat)
   ## return kernel
   return(out)
 }
@@ -87,6 +90,9 @@ rbfkernel_b <- function (mat, K = 3, sigma = 1) { # calculate gaussian kernel wi
   # reflect, diag = 1
   out <- pmax(out, t(out), na.rm = TRUE)
   diag(out) <- 1
+  # add names back on
+  colnames(out) <- colnames(mat)
+  row.names(out) <- colnames(mat)
   ## return kernel
   return(out)
 }
@@ -112,6 +118,10 @@ rbfkernel_b <- function (mat, K = 3, sigma = 1) { # calculate gaussian kernel wi
 ng_kernel <- function(data,sigma=0.1){
   dm <- Rfast::Dist(t(data))
   K <- exp(-dm^2/sigma)
+  #
+  colnames(K) <- colnames(data)
+  row.names(K) <- colnames(data)
+  #
   return(K)
 }
 
